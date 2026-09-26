@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#14293D">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="LevelBook">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png">
+<title>LevelBook – Study monitor</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--ink:#14293D;--paper:#EDF0F2;--card:#fff;--blue:#1E5A8C;--blue2:#DCE8F2;--orange:#E4630A;--green:#2E7D5B;--red:#B3382C;--muted:#5B6B7A;--line:#D3DAE0}
+html,body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+#app{max-width:720px;margin:0 auto;padding-bottom:96px}
+header{background:var(--ink);color:#fff;background-image:linear-gradient(rgba(255,255,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.06) 1px,transparent 1px);background-size:16px 16px;position:sticky;top:0;z-index:5;max-width:720px;margin:0 auto}
+.top{display:flex;align-items:center;gap:10px;padding:12px 16px}
+.brand{font-weight:800;font-size:20px;letter-spacing:.2px}
+.top .sub{opacity:.75;font-size:13px;flex:1}
+.top button{background:transparent;border:1px solid rgba(255,255,255,.35);color:#fff;border-radius:8px;padding:6px 10px;font-size:13px}
+.stripe{height:6px;background:repeating-linear-gradient(-45deg,var(--orange) 0 10px,var(--ink) 10px 20px)}
+main{padding:14px 14px 0}
+h2{font-size:20px;margin:6px 2px 10px}
+h3{font-size:16px;margin:0 0 8px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:12px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.between{justify-content:space-between}
+.c{text-align:center;flex:1}
+.muted{color:var(--muted);font-size:13px}
+.big{font-size:34px;font-weight:800;letter-spacing:-.5px;line-height:1.1}
+.mid{font-size:22px;font-weight:700}
+.btn{border:0;border-radius:8px;padding:10px 14px;font-size:14px;font-weight:600;background:var(--blue);color:#fff;cursor:pointer}
+.btn.pri{background:var(--orange)}
+.btn.ghost{background:transparent;color:var(--blue);border:1px solid var(--blue)}
+.btn.red{background:transparent;color:var(--red);border:1px solid var(--red)}
+.btn.sm{padding:6px 10px;font-size:13px}
+.btn:disabled{opacity:.5}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.chip{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:999px;padding:6px 12px;font-size:13px;cursor:pointer}
+.chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+input,select,textarea{width:100%;font:inherit;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink)}
+textarea{min-height:90px}
+label{display:block;font-size:13px;color:var(--muted);margin:8px 0 3px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.pb{height:8px;background:var(--blue2);border-radius:4px;overflow:hidden}
+.pb i{display:block;height:100%;background:var(--blue)}
+.pb.g i{background:var(--green)}
+.tile{background:var(--ink);color:#fff;border-radius:10px;padding:12px;border-left:6px solid var(--orange)}
+.tile .muted{color:#B9C6D2}
+.tile.set{border-left-color:#5B6B7A}
+.chart{width:100%;height:auto;display:block}
+.blk{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--line)}
+.blk:first-of-type{border-top:0}
+.chk{width:26px;height:26px;border-radius:6px;border:2px solid var(--blue);background:#fff;flex:none;color:#fff;font-weight:800;line-height:20px;text-align:center;padding:0}
+.chk.on{background:var(--green);border-color:var(--green)}
+.done{opacity:.55;text-decoration:line-through}
+.badge{font-size:11px;background:var(--orange);color:#fff;border-radius:6px;padding:1px 6px;font-weight:700}
+.badge.b{background:var(--blue)}
+.badge.g{background:var(--green)}
+.badge.r{background:var(--red)}
+.up{color:var(--green);font-weight:700}
+.down{color:var(--red);font-weight:700}
+.donutwrap{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.legend{display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:10px}
+.legend span{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+.sw{width:11px;height:11px;border-radius:3px;flex:none}
+table{width:100%;border-collapse:collapse;font-size:14px}
+td,th{padding:6px 4px;border-top:1px solid var(--line);text-align:left}
+th{color:var(--muted);font-weight:600;font-size:12px}
+td.n,th.n{text-align:right}
+.file{display:flex;gap:8px;align-items:center;padding:8px 0;border-top:1px solid var(--line)}
+.file .nm{flex:1;min-width:0;overflow-wrap:anywhere}
+.warn{background:#FFF1E6;border:1px solid var(--orange);border-radius:10px;padding:10px 12px;margin:12px 14px 0;font-size:13px}
+.info{background:#EAF1F8;border:1px solid var(--blue);border-radius:10px;padding:10px 12px;margin:12px 14px 0;font-size:13px}
+nav{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);display:flex;justify-content:center;padding-bottom:env(safe-area-inset-bottom);z-index:6}
+nav .in{display:flex;width:100%;max-width:720px}
+nav button{flex:1;background:none;border:0;padding:8px 0 7px;color:var(--muted);font-size:11px;display:flex;flex-direction:column;align-items:center;gap:2px}
+nav button.on{color:var(--blue);font-weight:700}
+nav svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+#toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:8px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:9;max-width:90%}
+#toast.show{opacity:1}
+:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div id="app">
+  <header id="hd"></header>
+  <div id="banner"></div>
+  <main id="main"></main>
+</div>
+<nav id="nav"></nav>
+<div id="toast"></div>
+<input type="file" id="inBackup" accept=".json,application/json" hidden>
+
+<script>
+"use strict";
+/* =========================================================
+   LevelBook – private study monitor for SSC JE + TNPSC AE
+   Everything is stored on this device (browser IndexedDB).
+   ========================================================= */
+
+/* ---------- small helpers ---------- */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid = () => Math.random().toString(36).slice(2, 9) + Date.now().toString(36).slice(-3);
+const pad = n => String(n).padStart(2, '0');
+const dkey = (d = new Date()) => d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+const pdate = k => { const [y, m, d] = k.split('-').map(Number); return new Date(y, m - 1, d); };
+const addDays = (k, n) => { const d = pdate(k); d.setDate(d.getDate() + n); return dkey(d); };
+const t2m = t => { const [h, m] = String(t || '0:0').split(':').map(Number); return (h || 0) * 60 + (m || 0); };
+const fmtMin = m => { m = Math.round(m); const h = Math.floor(m / 60); return h ? h + 'h ' + pad(m % 60) + 'm' : m + 'm'; };
+const clock = s => { s = Math.max(0, Math.floor(s)); const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60); return (h ? h + ':' + pad(m) : m) + ':' + pad(s % 60); };
+const fmtDate = k => pdate(k).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' });
+const fmtSize = b => b > 1048576 ? (b / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(b / 1024)) + ' KB';
+const r2 = n => Math.round(n * 100) / 100;
+const norm = s => String(s).toLowerCase().replace(/[^a-z0-9]/g, '');
+const DAYS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+const DAYNAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const weekKey = k => { const d = pdate(k); return addDays(k, -((d.getDay() + 6) % 7)); };
+function toast(m) { const t = $('#toast'); t.textContent = m; t.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('show'), 2600); }
+
+/* ---------- default data ---------- */
+const DEFAULT_SUBJECTS = ['Strength of Materials', 'Structural Analysis', 'RCC Design', 'Steel Structures', 'Soil Mechanics & Foundation', 'Fluid Mechanics & Hydraulics', 'Irrigation Engineering', 'Environmental Engineering', 'Transportation Engineering', 'Surveying', 'Building Materials & Construction', 'Estimating & Costing', 'Engineering Mechanics', 'Reasoning', 'General Awareness', 'General Studies (TNPSC)'];
+const CORE_CIVIL = ['Strength of Materials', 'Structural Analysis', 'RCC Design', 'Steel Structures', 'Soil Mechanics & Foundation', 'Fluid Mechanics & Hydraulics', 'Irrigation Engineering', 'Environmental Engineering', 'Transportation Engineering', 'Surveying', 'Building Materials & Construction', 'Estimating & Costing', 'Engineering Mechanics'];
+const B = (start, end, subject, task, cat = 'study') => ({ id: uid(), start, end, subject, task, cat });
+const CATS = { study: 'Study', class: 'Coaching', meal: 'Meal', rest: 'Rest / travel', sleep: 'Sleep' };
+const TRACKED = ['study', 'class'];
+const dur = b => ((t2m(b.end) - t2m(b.start)) + 1440) % 1440;
+function defaultSchedules() {
+  const C = 'Civil (mixed)', AP = 'Aptitude & Reasoning', PQ = 'PYQs and error notebook';
+  return {
+    A: [B('04:45', '05:30', C, 'Revision'), B('05:30', '06:00', 'Get ready / travel', '', 'rest'), B('06:00', '14:00', 'Coaching', '', 'class'), B('14:00', '14:45', 'Lunch + rest', '', 'meal'), B('14:45', '16:15', 'Rest / sleep', '', 'rest'), B('16:15', '18:15', C, 'Civil practice + MCQs'), B('18:15', '19:00', 'Break', '', 'rest'), B('19:00', '20:00', AP, 'Aptitude / Reasoning'), B('20:00', '21:00', PQ, 'Revision / PYQs'), B('21:00', '21:30', 'Dinner', '', 'meal'), B('21:30', '22:15', C, 'Light revision'), B('22:30', '04:45', 'Sleep', '', 'sleep')],
+    B: [B('06:00', '07:30', C, 'Civil revision + MCQs'), B('07:30', '08:30', AP, 'Aptitude'), B('08:30', '09:00', 'Get ready', '', 'rest'), B('09:00', '09:30', 'Breakfast', '', 'meal'), B('09:30', '10:30', PQ, 'PYQs / revision'), B('10:30', '18:30', 'Coaching', '', 'class'), B('18:30', '19:30', 'Travel + rest', '', 'rest'), B('19:30', '20:30', C, 'Coaching-topic practice'), B('20:30', '21:00', C, 'Light revision'), B('21:00', '21:30', 'Dinner', '', 'meal'), B('21:30', '22:15', PQ, 'Error notebook / formulas'), B('22:30', '06:00', 'Sleep', '', 'sleep')],
+    C: [B('06:00', '07:30', C, 'Civil revision'), B('07:30', '08:30', C, 'MCQs'), B('08:30', '09:00', 'Get ready', '', 'rest'), B('09:00', '09:30', 'Breakfast', '', 'meal'), B('09:30', '11:00', AP, 'Aptitude / Reasoning'), B('11:00', '12:00', PQ, 'PYQs'), B('12:00', '12:30', 'Travel', '', 'rest'), B('12:30', '20:30', 'Coaching', '', 'class'), B('20:30', '21:00', 'Travel', '', 'rest'), B('21:00', '21:30', 'Dinner', '', 'meal'), B('21:30', '22:15', C, 'Very light revision'), B('22:30', '06:00', 'Sleep', '', 'sleep')]
+  };
+}
+function defaultState() {
+  return {
+    v: 3,
+    settings: {
+      name: '',
+      exams: { SSC: { label: 'SSC JE', date: '' }, TN: { label: 'TNPSC AE', date: '' } },
+      sleepGoal: 7.5,
+      weekMap: ['A', 'A', 'A', 'A', 'A', 'A', 'A'],
+      schedNames: { A: 'Batch 1 · 6 AM–2 PM', B: 'Batch 2 · 10:30 AM–6:30 PM', C: 'Batch 3 · 12:30–8:30 PM' },
+      subjects: DEFAULT_SUBJECTS.slice(),
+      targets: { mcq: 40, pyq: 20, apt: 20, rev: 40 },
+      revision: { order: CORE_CIVIL.slice(), start: weekKey(dkey()), overrides: {} }
+    },
+    schedules: defaultSchedules(),
+    overrides: {}, done: {}, tlog: {}, wlog: {}, weekOff: {},
+    sessions: [], syllabus: {}, sleep: {},
+    files: [], comps: [],
+    timer: null, sync: { last: 0, added: 0, upd: 0 }
+  };
+}
+let state = defaultState();
+let memMode = false, storageNote = '';
+const ui = {
+  tab: 'home', planDate: dkey(), planEdit: false, editType: 'A', tExam: 'SSC', silSub: '',
+  compForm: null, compSubj: '', compHidden: {}, woForm: null
+};
+
+/* ---------- storage (IndexedDB) ---------- */
+let db = null, downloadsCap = null;
+(async () => { try { if (window.claude && window.claude.use) downloadsCap = await window.claude.use('downloads'); } catch (e) {} })();
+function idb(store, mode, fn) {
+  return new Promise((res, rej) => {
+    const tx = db.transaction(store, mode); const r = fn(tx.objectStore(store));
+    tx.oncomplete = () => res(r && r.result); tx.onerror = () => rej(tx.error); tx.onabort = () => rej(tx.error);
+  });
+}
+const idbGet = (s, k) => idb(s, 'readonly', o => o.get(k));
+const idbPut = (s, v, k) => idb(s, 'readwrite', o => o.put(v, k));
+const idbDel = (s, k) => idb(s, 'readwrite', o => o.delete(k));
+let saveT;
+function save() { if (memMode) return; clearTimeout(saveT); saveT = setTimeout(() => idbPut('kv', state, 'state').catch(() => {}), 250); }
+function migrateTestsToComps(oldTests) {
+  return (oldTests || []).map(t => {
+    let subs;
+    if (t.by && Object.keys(t.by).length) subs = Object.entries(t.by).map(([s, v]) => ({ subject: s || 'General', max: null, got: null, correct: v.c, wrong: v.w }));
+    else subs = [{ subject: t.subject || 'General', max: t.maxMarks || null, got: t.score, correct: t.correct != null ? t.correct : null, wrong: t.wrong != null ? t.wrong : null }];
+    return { id: t.id || uid(), ts: t.ts || Date.now(), name: t.title || 'Test', date: t.date || dkey(), examTag: t.exam || 'GEN', rank: null, rankOut: null, subjects: subs, totalMax: t.maxMarks || null, totalGot: t.score != null ? t.score : null };
+  });
+}
+function mergeState(s) {
+  const d = defaultState(), ds = d.settings, ss = s.settings || {};
+  const m = Object.assign(d, s);
+  m.settings = Object.assign({}, ds, ss);
+  m.settings.exams = Object.assign({}, ds.exams, ss.exams || {});
+  m.settings.targets = Object.assign({}, ds.targets, ss.targets || {});
+  m.settings.schedNames = Object.assign({}, ds.schedNames, ss.schedNames || {});
+  m.settings.revision = Object.assign({}, ds.revision, ss.revision || {});
+  m.settings.subjects = (ss.subjects || ds.subjects).slice();
+  DEFAULT_SUBJECTS.forEach(x => { if (!m.settings.subjects.includes(x)) m.settings.subjects.push(x); });
+  if (!s.v || s.v < 2) { const f = defaultState(); m.schedules = f.schedules; m.settings.schedNames = f.settings.schedNames; m.settings.weekMap = f.settings.weekMap; }
+  if (!s.v || s.v < 3) { m.comps = migrateTestsToComps(s.tests); }
+  m.comps = m.comps || [];
+  m.weekOff = m.weekOff || {};
+  delete m.questions; delete m.tests; delete m.run;
+  m.v = 3;
+  return m;
+}
+async function init() {
+  try {
+    db = await new Promise((res, rej) => {
+      const r = indexedDB.open('levelbook', 1);
+      r.onupgradeneeded = () => { r.result.createObjectStore('kv'); r.result.createObjectStore('blobs'); };
+      r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+    });
+    const s = await idbGet('kv', 'state'); if (s) state = mergeState(s);
+    if (navigator.storage && navigator.storage.persist) navigator.storage.persist();
+  } catch (e) { memMode = true; }
+  try {
+    if (location.protocol === 'content:' || (location.protocol !== 'file:' && location.protocol !== 'http:' && location.protocol !== 'https:')) {
+      storageNote = 'This copy was opened through an app picker, which can give a different, empty storage area each time. Save the file to one fixed folder, open it in Chrome from that exact path (or a bookmark of it), and use "Add to Home screen" from that same tab so your data stays in one place.';
+    }
+  } catch (e) {}
+  ui.silSub = state.settings.subjects[0] || '';
+  render(); setInterval(tick, 1000); setupInstall();
+}
+
+/* ---------- schedule helpers ---------- */
+const exl = k => (state.settings.exams[k] || {}).label || k;
+const schedFor = k => state.overrides[k] || state.settings.weekMap[pdate(k).getDay()] || 'A';
+const sortB = a => a.slice().sort((x, y) => t2m(x.start) - t2m(y.start));
+const isDone = (k, type, id) => !!(state.done[k] && state.done[k][type + ':' + id]);
+const minutesOn = k => state.sessions.filter(s => s.date === k).reduce((a, s) => a + s.minutes, 0);
+const runningMin = () => state.timer ? Math.floor((Date.now() - state.timer.start) / 60000) : 0;
+function streak() { let k = dkey(), n = 0; if (minutesOn(k) < 30) k = addDays(k, -1); while (minutesOn(k) >= 30) { n++; k = addDays(k, -1); } return n; }
+const subjOpts = sel => state.settings.subjects.map(s => `<option ${s === sel ? 'selected' : ''}>${esc(s)}</option>`).join('');
+function revSubjectFor(wk) {
+  const rev = state.settings.revision;
+  if (rev.overrides && rev.overrides[wk]) return rev.overrides[wk];
+  const ord = rev.order; if (!ord.length) return null;
+  const start = weekKey(rev.start);
+  const diff = Math.round((pdate(wk) - pdate(start)) / (7 * 86400000));
+  return ord[((diff % ord.length) + ord.length) % ord.length];
+}
+function monthWeeks() {
+  const now = pdate(dkey()), first = new Date(now.getFullYear(), now.getMonth(), 1), last = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  const weeks = []; let w = weekKey(dkey(first));
+  while (pdate(w) <= last) { weeks.push(w); w = addDays(w, 7); }
+  return weeks;
+}
+function revisionStats() {
+  const rev = state.settings.revision, start = weekKey(rev.start), nowWk = weekKey(dkey());
+  const weeks = Math.max(0, Math.round((pdate(nowWk) - pdate(start)) / (7 * 86400000))) + 1;
+  const stats = {};
+  for (let i = 0; i < weeks; i++) { const wk = addDays(start, 7 * i), subj = revSubjectFor(wk); if (!subj) continue; const st = stats[subj] = stats[subj] || { scheduled: 0, done: 0 }; st.scheduled++; if ((state.wlog[wk] || {}).revision) st.done++; }
+  const ordered = rev.order.filter(s => stats[s]), extra = Object.keys(stats).filter(s => !rev.order.includes(s));
+  return [...ordered, ...extra].map(s => Object.assign({ subject: s }, stats[s]));
+}
+function revisionStreak() {
+  let wk = weekKey(dkey()), n = 0;
+  while ((state.wlog[wk] || {}).revision) { n++; wk = addDays(wk, -7); }
+  return n;
+}
+function chkRow(label, on, act, f, k) { return `<div class="blk" style="padding:6px 0"><button class="chk ${on ? 'on' : ''}" data-act="${act}" data-f="${f}" data-k="${k}" aria-label="${esc(label)}">${on ? '✓' : ''}</button><div class="${on ? 'done' : ''}">${label}</div></div>`; }
+
+/* ---------- charts ---------- */
+function barSVG(vals, labels, goal) {
+  const W = 300, H = 120, pb = 18, pt = 8, n = vals.length, bw = W / n, max = Math.max(goal || 0, ...vals, 1);
+  let s = `<svg viewBox="0 0 ${W} ${H}" class="chart" role="img" aria-label="Bar chart">`;
+  vals.forEach((v, i) => {
+    const h = (H - pb - pt) * v / max, x = i * bw + bw * .2;
+    s += `<rect x="${x}" y="${H - pb - h}" width="${bw * .6}" height="${v > 0 ? Math.max(h, 2) : 0}" rx="2" fill="#1E5A8C"/><text x="${i * bw + bw / 2}" y="${H - 5}" text-anchor="middle" font-size="9" fill="#5B6B7A">${labels[i]}</text>`;
+  });
+  if (goal) { const y = H - pb - (H - pb - pt) * goal / max; s += `<line x1="0" x2="${W}" y1="${y}" y2="${y}" stroke="#E4630A" stroke-dasharray="4 3"/>`; }
+  return s + '</svg>';
+}
+const PALETTE = ['#1E5A8C', '#E4630A', '#2E7D5B', '#B3382C', '#8E44AD', '#D4A017', '#0E9AA7', '#C2185B', '#3F51B5', '#00897B'];
+const pctColor = pct => pct == null ? '#5B6B7A' : pct >= 60 ? '#2E7D5B' : pct >= 40 ? '#E4630A' : '#B3382C';
+function lineSVG(vals, max, color) {
+  const W = 300, H = 110, p = 12; if (!vals.length) return ''; max = max || Math.max(...vals, 1); color = color || '#1E5A8C';
+  const pts = vals.map((v, i) => [vals.length === 1 ? W / 2 : p + i * (W - 2 * p) / (vals.length - 1), H - p - (H - 2 * p) * Math.min(v, max) / max]);
+  let s = `<svg viewBox="0 0 ${W} ${H}" class="chart" role="img" aria-label="Trend chart"><line x1="0" x2="${W}" y1="${H - p}" y2="${H - p}" stroke="#D3DAE0"/>`;
+  s += `<polyline fill="none" stroke="${color}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" points="${pts.map(q => q.join(',')).join(' ')}"/>`;
+  pts.forEach((q, i) => s += `<circle cx="${q[0]}" cy="${q[1]}" r="3.5" fill="#E4630A"/><text x="${q[0]}" y="${q[1] - 7}" text-anchor="middle" font-size="9" fill="#14293D">${Math.round(vals[i])}</text>`);
+  return s + '</svg>';
+}
+function barSVGColored(vals, labels) {
+  const W = 300, H = 120, pb = 18, pt = 8, n = vals.length, bw = W / n, max = 100;
+  let s = `<svg viewBox="0 0 ${W} ${H}" class="chart" role="img" aria-label="Bar chart">`;
+  vals.forEach((v, i) => {
+    const h = (H - pb - pt) * Math.min(v, max) / max, x = i * bw + bw * .22, color = pctColor(v);
+    s += `<rect x="${x}" y="${H - pb - h}" width="${bw * .56}" height="${Math.max(h, 2)}" rx="3" fill="${color}"/><text x="${i * bw + bw / 2}" y="${H - pb - h - 4}" text-anchor="middle" font-size="8" fill="#14293D">${Math.round(v)}</text><text x="${i * bw + bw / 2}" y="${H - 5}" text-anchor="middle" font-size="9" fill="#5B6B7A">${labels[i]}</text>`;
+  });
+  return s + '</svg>';
+}
+function multiLineSVG(list, entries) {
+  const W = 300, H = 150, p = 14; if (!list.length || !entries.length) return '';
+  const n = list.length, xAt = i => n === 1 ? W / 2 : p + i * (W - 2 * p) / (n - 1);
+  let s = `<svg viewBox="0 0 ${W} ${H}" class="chart" role="img" aria-label="Comparative growth chart"><line x1="0" x2="${W}" y1="${H - p}" y2="${H - p}" stroke="#D3DAE0"/>`;
+  entries.forEach(({ subject, color }) => {
+    const pts = [];
+    list.forEach((c, i) => { const row = c.subjects.find(x => x.subject === subject && x.max); if (row) pts.push([xAt(i), p + (H - 2 * p) * (1 - Math.min(row.got / row.max * 100, 100) / 100)]); });
+    if (pts.length) { s += `<polyline fill="none" stroke="${color}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" points="${pts.map(q => q.join(',')).join(' ')}"/>`; pts.forEach(q => s += `<circle cx="${q[0]}" cy="${q[1]}" r="3.2" fill="${color}"/>`); }
+  });
+  return s + '</svg>';
+}
+function donutSVG(pct, color) {
+  pct = Math.max(0, Math.min(100, pct || 0)); color = color || '#1E5A8C';
+  const R = 42, C = 2 * Math.PI * R, off = C * (1 - pct / 100);
+  return `<svg viewBox="0 0 100 100" style="width:96px;height:96px" role="img" aria-label="${Math.round(pct)} percent"><circle cx="50" cy="50" r="${R}" stroke="#DCE8F2" stroke-width="10" fill="none"/><circle cx="50" cy="50" r="${R}" stroke="${color}" stroke-width="10" fill="none" stroke-dasharray="${r2(C)}" stroke-dashoffset="${r2(off)}" stroke-linecap="round" transform="rotate(-90 50 50)"/><text x="50" y="56" text-anchor="middle" font-size="22" font-weight="700" fill="#14293D">${Math.round(pct)}%</text></svg>`;
+}
+
+/* =========================================================
+   VIEWS
+   ========================================================= */
+const ICONS = {
+  home: '<path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
+  plan: '<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/>',
+  track: '<circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6"/>',
+  rev: '<path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/>',
+  comp: '<path d="M4 19V10M10 19V5M16 19v-8M4 19h16"/>',
+  sleep: '<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>'
+};
+const NAV = [['home', 'Home'], ['plan', 'Plan'], ['track', 'Track'], ['rev', 'Revision'], ['comp', 'Scores'], ['sleep', 'Sleep']];
+const TITLES = { home: 'Dashboard', plan: 'Study plan', track: 'Study tracker', rev: 'Weekly revision', comp: 'Comprehensive tests', sleep: 'Sleep and activity', settings: 'Settings' };
+
+function render() {
+  $('#hd').innerHTML = `<div class="top"><div class="brand">LevelBook</div><div class="sub">${TITLES[ui.tab]}</div><button data-act="tab" data-t="settings">Settings</button></div><div class="stripe"></div>`;
+  $('#nav').innerHTML = `<div class="in">${NAV.map(([k, l]) => `<button class="${ui.tab === k ? 'on' : ''}" data-act="tab" data-t="${k}" aria-label="${l}"><svg viewBox="0 0 24 24">${ICONS[k]}</svg>${l}</button>`).join('')}</div>`;
+  let banner = '';
+  if (memMode) banner = `<div class="warn"><b>Data is not being saved right now.</b> This page can't store data here. Open LevelBook.html in Chrome (not an in-app browser) and try again.</div>`;
+  else if (storageNote) banner = `<div class="info">${esc(storageNote)}</div>`;
+  $('#banner').innerHTML = banner;
+  const v = { home: vHome, plan: vPlan, track: vTrack, rev: vRevision, comp: vComp, sleep: vSleep, settings: vSettings }[ui.tab];
+  try { $('#main').innerHTML = v(); } catch (e) { $('#main').innerHTML = `<div class="card"><b>Something went wrong.</b><p class="muted">${esc(e.message)}</p></div>`; console.error(e); }
+}
+
+/* ---------- Daily / weekly targets ---------- */
+const TG = [['mcq', 'Civil MCQs', 10], ['pyq', 'PYQs', 5], ['apt', 'Aptitude questions', 5], ['rev', 'Older-topic revision (min)', 15]];
+function targetsCard(k, ctl) {
+  const lg = state.tlog[k] || {}, tg = state.settings.targets, wk = weekKey(k), wl = state.wlog[wk] || {};
+  const revSubj = revSubjectFor(wk), compThisWeek = state.comps.some(c => weekKey(c.date) === wk);
+  let h = `<div class="card"><div class="row between"><h3 style="margin:0">Today's targets</h3>${ctl ? '' : `<button class="btn sm ghost" data-act="tab" data-t="track">Update</button>`}</div>`;
+  TG.forEach(([f, l, step]) => {
+    const v = lg[f] || 0, goal = tg[f] || 1;
+    h += `<div style="margin-top:10px"><div class="row between"><span>${l}</span><span><b>${v}</b> <span class="muted">/ ${goal}</span>${ctl ? ` <button class="btn sm ghost" data-act="tgtAdd" data-f="${f}" data-d="${-step}" aria-label="Minus ${step}">−${step}</button> <button class="btn sm" data-act="tgtAdd" data-f="${f}" data-d="${step}">+${step}</button>` : ''}</span></div><div class="pb ${v >= goal ? 'g' : ''}"><i style="width:${Math.min(100, v / goal * 100)}%"></i></div></div>`;
+  });
+  h += `<div style="margin-top:12px">${chkRow("Revise today's coaching topic", lg.topic, 'tgtToggle', 'topic', k)}${chkRow('Review mistakes', lg.mist, 'tgtToggle', 'mist', k)}</div>`;
+  h += `<p style="margin:12px 0 2px"><b>This week</b></p>${chkRow('Full revision' + (revSubj ? ': ' + esc(revSubj) : ''), wl.revision, 'wkToggle', 'revision', k)}${chkRow('Revise formulas / error notes', wl.errnb, 'wkToggle', 'errnb', k)}${compThisWeek ? chkRow("Analyse this week's comprehensive test", wl.compan, 'wkToggle', 'compan', k) : ''}</div>`;
+  return h;
+}
+
+/* ---------- Home / dashboard ---------- */
+function vHome() {
+  const t = dkey(), type = schedFor(t), blocks = sortB(state.schedules[type] || []);
+  const tb = blocks.filter(b => TRACKED.includes(b.cat || 'study')), dn = tb.filter(b => isDone(t, type, b.id)).length;
+  const tm = minutesOn(t) + runningMin();
+  const now = new Date(), nowM = now.getHours() * 60 + now.getMinutes();
+  const next = blocks.find(b => !isDone(t, type, b.id) && t2m(b.end) > nowM);
+  const wo = state.weekOff[t];
+  const days = [...Array(7)].map((_, i) => addDays(t, i - 6));
+  const wk = days.map(minutesOn);
+  let h = '';
+  if (state.settings.name) h += `<h2>Hello, ${esc(state.settings.name)}</h2>`;
+  h += `<div class="grid2" style="margin-bottom:12px">` + ['SSC', 'TN'].map(k => {
+    const e = state.settings.exams[k];
+    if (!e.date) return `<div class="tile set"><div>${esc(e.label)}</div><div class="mid">No date</div><button class="btn sm ghost" style="color:#fff;border-color:#fff;margin-top:6px" data-act="tab" data-t="settings">Set exam date</button></div>`;
+    const d = Math.ceil((pdate(e.date) - pdate(t)) / 864e5);
+    return `<div class="tile"><div>${esc(e.label)}</div><div class="big">${d >= 0 ? d : 0}</div><div class="muted">${d >= 0 ? 'days left' : 'exam date passed'} · ${fmtDate(e.date)}</div></div>`;
+  }).join('') + `</div>`;
+
+  h += `<div class="card"><div class="row between"><h3 style="margin:0">Today</h3><span class="badge b">${esc(state.settings.schedNames[type])}</span></div>
+    <div class="chips"><span class="muted" style="align-self:center">Today's batch:</span>${['A', 'B', 'C'].map(x => `<button class="chip ${x === type ? 'on' : ''}" data-act="setTypeToday" data-t="${x}">${esc(state.settings.schedNames[x].split(' · ')[0])}</button>`).join('')}</div>
+    <p class="muted" style="margin:6px 0 4px">Study time ${fmtMin(tm)}</p>
+    <p class="muted" style="margin:10px 0 4px">Schedule ${dn} of ${tb.length} done</p><div class="pb"><i style="width:${tb.length ? dn / tb.length * 100 : 0}%"></i></div>
+    <div style="margin-top:12px">${next ? `<b>Next: ${esc((next.cat || 'study') === 'study' && next.task ? next.task : next.subject)}</b><div class="muted">${next.start}–${next.end} ${esc(next.task || '')}</div>` : `<span class="muted">${tb.length ? "Nothing left on today's schedule." : 'No schedule set for today.'}</span>`}</div>
+    <div class="row" style="margin-top:10px"><button class="btn sm" data-act="tab" data-t="plan">Open plan</button><button class="btn sm ghost" data-act="tab" data-t="track">Start timer</button></div></div>`;
+
+  if (wo) {
+    const done = wo.subjects.filter(s => wo.done && wo.done[s]).length;
+    h += `<div class="card" style="border-left:4px solid var(--orange)"><div class="row between"><h3 style="margin:0">Academy day off today</h3><button class="btn sm ghost" data-act="tab" data-t="rev">Manage</button></div><p class="muted" style="margin:4px 0 0">${done}/${wo.subjects.length} revised</p>` + wo.subjects.map(s => chkRow(esc(s), !!(wo.done && wo.done[s]), 'woToggleDone', s, t)).join('') + `</div>`;
+  }
+  h += targetsCard(t, false);
+
+  h += `<div class="grid3" style="margin-bottom:12px">
+    <div class="card" style="margin:0"><div class="mid">${streak()}</div><div class="muted">day streak (30+ min)</div></div>
+    <div class="card" style="margin:0"><div class="mid">${fmtMin(wk.reduce((a, b) => a + b, 0))}</div><div class="muted">last 7 days</div></div>
+    <div class="card" style="margin:0"><div class="mid">${state.comps.length}</div><div class="muted">comprehensive tests</div></div></div>`;
+
+  h += `<div class="card"><h3>Study minutes, last 7 days</h3>${barSVG(wk, days.map(k => DAYS[pdate(k).getDay()]))}</div>`;
+
+  const subs = Object.entries(state.syllabus).filter(([, a]) => a.length);
+  const tot = subs.reduce((a, [, x]) => a + x.length, 0), don = subs.reduce((a, [, x]) => a + x.filter(y => y.s >= 2).length, 0);
+  h += `<div class="card"><h3>Syllabus progress</h3>` + (tot ? `<div class="donutwrap"><div>${donutSVG(don / tot * 100, '#2E7D5B')}</div><div style="flex:1;min-width:160px">` +
+    subs.map(([s, a]) => { const d = a.filter(y => y.s >= 2).length; return `<div class="row between" style="margin-top:4px"><span>${esc(s)}</span><span class="muted">${d}/${a.length}</span></div><div class="pb"><i style="width:${d / a.length * 100}%"></i></div>`; }).join('') + `</div></div>` : `<p class="muted">Add topics under Track → Syllabus to see progress here.</p>`) + `</div>`;
+
+  if (state.comps.length) {
+    const sorted = state.comps.slice().sort((a, b) => a.date.localeCompare(b.date) || a.ts - b.ts), last = sorted[sorted.length - 1];
+    const pts = sorted.map(c => c.totalMax ? c.totalGot / c.totalMax * 100 : null).filter(x => x != null);
+    h += `<div class="card"><div class="row between"><h3 style="margin:0">Comprehensive tests</h3><button class="btn sm ghost" data-act="tab" data-t="comp">View all</button></div>
+    <p class="muted" style="margin:4px 0 8px">Latest: ${esc(last.name)}${last.rank ? ' · Rank ' + last.rank + (last.rankOut ? '/' + last.rankOut : '') : ''}${last.totalMax ? ' · ' + r2(last.totalGot) + '/' + last.totalMax : ''}</p>
+    ${pts.length > 1 ? lineSVG(pts) : ''}</div>`;
+  }
+
+  const sl = Object.keys(state.sleep).sort().slice(-7).map(k => state.sleep[k]);
+  const last = state.sleep[Object.keys(state.sleep).sort().pop()];
+  h += `<div class="card"><h3>Sleep</h3>` + (sl.length ? `<div class="row between"><span>Last night <b>${last.hours.toFixed(1)} h</b></span><span class="muted">7-day average ${(sl.reduce((a, s) => a + s.hours, 0) / sl.length).toFixed(1)} h · goal ${state.settings.sleepGoal} h</span></div>` : `<p class="muted">No sleep logged yet.</p>`) + `<button class="btn sm ghost" style="margin-top:8px" data-act="tab" data-t="sleep">Log sleep</button></div>`;
+
+  h += `<div class="card"><h3>Backup</h3><p class="muted" style="margin:0 0 8px">Save a copy of everything on this device, in case you switch phones or your browser data gets cleared.</p><div class="row"><button class="btn sm" data-act="exportData">Save backup</button><button class="btn sm ghost" data-act="importData">Restore backup</button></div></div>`;
+  return h;
+}
+
+/* ---------- Plan ---------- */
+function vPlan() {
+  if (ui.planEdit) return vPlanEdit();
+  const k = ui.planDate, type = schedFor(k), blocks = sortB(state.schedules[type] || []), isToday = k === dkey();
+  let h = `<div class="card"><div class="row between"><button class="btn sm ghost" data-act="planNav" data-d="-1" aria-label="Previous day">‹</button><div class="c"><b>${fmtDate(k)}${isToday ? ' (today)' : ''}</b><div class="muted">${esc(state.settings.schedNames[type])}</div></div><button class="btn sm ghost" data-act="planNav" data-d="1" aria-label="Next day">›</button></div>
+    <p class="muted" style="margin:10px 0 0">Which coaching batch is this day?</p><div class="chips">${['A', 'B', 'C'].map(x => `<button class="chip ${x === type ? 'on' : ''}" data-act="setType" data-t="${x}">${esc(state.settings.schedNames[x])}</button>`).join('')}</div>
+    <div class="row"><button class="btn sm ghost" data-act="applyWeek">Use this batch for the next 7 days</button>${!isToday ? `<button class="btn sm ghost" data-act="planToday">Back to today</button>` : ''}</div></div><div class="card">`;
+  if (!blocks.length) h += `<p class="muted">This schedule is empty. Use Edit schedules to add time blocks.</p>`;
+  blocks.forEach(b => {
+    const d = isDone(k, type, b.id), cat = b.cat || 'study', study = cat === 'study', dim = !TRACKED.includes(cat);
+    h += `<div class="blk"><button class="chk ${d ? 'on' : ''}" data-act="toggleBlock" data-id="${b.id}" aria-label="Mark done">${d ? '✓' : ''}</button><div style="flex:1"><div class="${d ? 'done' : ''}" style="${dim ? 'color:var(--muted)' : ''}"><b>${esc(study && b.task ? b.task : b.subject)}</b>${cat === 'class' ? ' <span class="badge b">coaching</span>' : ''}</div><div class="muted">${b.start}–${b.end} · ${fmtMin(dur(b))}${study ? ' · ' + esc(b.subject) : b.task ? ' · ' + esc(b.task) : ''}</div></div>${isToday && !d && !state.timer && study ? `<button class="btn sm ghost" data-act="startBlock" data-id="${b.id}">Start</button>` : ''}</div>`;
+  });
+  h += `</div><button class="btn" data-act="planEditOn">Edit schedules</button>`;
+  return h;
+}
+function vPlanEdit() {
+  const t = ui.editType, list = state.schedules[t];
+  let h = `<div class="row between" style="margin-bottom:8px"><h2 style="margin:0">Edit schedules</h2><button class="btn sm ghost" data-act="planEditOff">Done</button></div>
+  <div class="chips">${['A', 'B', 'C'].map(x => `<button class="chip ${x === t ? 'on' : ''}" data-act="editTab" data-t="${x}">${esc(state.settings.schedNames[x])}</button>`).join('')}</div>
+  <div class="card"><label>Schedule name</label><input value="${esc(state.settings.schedNames[t])}" data-ch="schedName">`;
+  list.forEach(b => {
+    const cat = b.cat || 'study';
+    h += `<div style="border-top:1px solid var(--line);margin-top:12px;padding-top:8px"><div class="row"><input type="time" value="${b.start}" data-ch="blk" data-id="${b.id}" data-f="start" style="flex:1"><span>to</span><input type="time" value="${b.end}" data-ch="blk" data-id="${b.id}" data-f="end" style="flex:1"><button class="btn sm red" data-act="delBlock" data-id="${b.id}" aria-label="Delete block">Delete</button></div>
+    <select data-ch="blk" data-id="${b.id}" data-f="cat" style="margin-top:6px">${Object.entries(CATS).map(([k, v]) => `<option value="${k}" ${k === cat ? 'selected' : ''}>${v}</option>`).join('')}</select>
+    ${cat === 'study' ? `<select data-ch="blk" data-id="${b.id}" data-f="subject" style="margin-top:6px">${subjOpts(b.subject)}${state.settings.subjects.includes(b.subject) ? '' : `<option selected>${esc(b.subject)}</option>`}</select>` : `<input value="${esc(b.subject)}" data-ch="blk" data-id="${b.id}" data-f="subject" style="margin-top:6px">`}
+    <input placeholder="What to do (revision, MCQs, PYQs…)" value="${esc(b.task)}" data-ch="blk" data-id="${b.id}" data-f="task" style="margin-top:6px"></div>`;
+  });
+  h += `<div class="row" style="margin-top:12px"><button class="btn sm" data-act="addBlock">Add time block</button></div></div>
+  <div class="card"><h3>Paste a schedule</h3><p class="muted">One block per line, like <i>6:00-7:30 Civil revision</i>. Words like coaching, breakfast, lunch, dinner, travel, rest and sleep are sorted automatically. This replaces "${esc(state.settings.schedNames[t])}".</p><textarea id="paste" placeholder="06:00-07:30 Civil revision&#10;10:30-18:30 Coaching"></textarea><button class="btn sm" style="margin-top:8px" data-act="pasteSched">Replace with pasted lines</button></div>
+  <div class="card"><h3>Default batch for each weekday</h3><p class="muted" style="margin-top:0">Your batch timing changes, so you can also change any single day from the Plan or Home screen.</p>${[1, 2, 3, 4, 5, 6, 0].map(d => `<div class="row between" style="margin-bottom:6px"><span>${DAYNAMES[d]}</span><select data-ch="weekMap" data-d="${d}" style="width:60%">${['A', 'B', 'C'].map(x => `<option value="${x}" ${state.settings.weekMap[d] === x ? 'selected' : ''}>${esc(state.settings.schedNames[x])}</option>`).join('')}</select></div>`).join('')}</div>`;
+  return h;
+}
+
+/* ---------- Track ---------- */
+function vTrack() {
+  const tm = state.timer, t = dkey(), todays = state.sessions.filter(s => s.date === t);
+  let h = targetsCard(t, true) + `<div class="card"><h3>Study timer</h3>`;
+  if (tm) h += `<div class="big" id="tmr">${clock((Date.now() - tm.start) / 1000)}</div><p class="muted">${esc(tm.subject)}${tm.topic ? ' · ' + esc(tm.topic) : ''} (${esc(exl(tm.exam))})</p><div class="row"><button class="btn pri" data-act="stopTimer">Stop and save</button><button class="btn ghost" data-act="cancelTimer">Discard</button></div>`;
+  else h += `<div class="chips">${['SSC', 'TN'].map(k => `<button class="chip ${ui.tExam === k ? 'on' : ''}" data-act="tExam" data-k="${k}">${esc(exl(k))}</button>`).join('')}</div>
+    <label>Subject</label><select id="tsub">${subjOpts()}</select><label>Topic (optional)</label><input id="ttopic" placeholder="e.g. Bending moment diagrams"><div style="margin-top:10px"><button class="btn pri" data-act="startTimer">Start timer</button></div>`;
+  h += `</div>`;
+  h += `<div class="card"><h3>Add study time by hand</h3><div class="grid2"><div><label>Date</label><input type="date" id="mdate" value="${t}"></div><div><label>Minutes</label><input type="number" id="mmin" min="1" placeholder="60"></div></div><label>Subject (${esc(exl(ui.tExam))})</label><select id="msub">${subjOpts()}</select><div style="margin-top:10px"><button class="btn" data-act="addSession">Add</button></div></div>`;
+  h += `<div class="card"><h3>Today: ${fmtMin(minutesOn(t))}</h3>` + (todays.length ? todays.slice().reverse().map(s => `<div class="row between" style="padding:6px 0;border-top:1px solid var(--line)"><span>${esc(s.subject)}<span class="muted"> ${esc(exl(s.exam))}${s.topic ? ' · ' + esc(s.topic) : ''}</span></span><span><b>${fmtMin(s.minutes)}</b> <button class="btn sm red" data-act="delSession" data-id="${s.id}" aria-label="Delete">×</button></span></div>`).join('') : '<p class="muted">No study logged today.</p>') + `</div>`;
+  const by = {}; state.sessions.filter(s => s.date >= addDays(t, -6)).forEach(s => by[s.subject] = (by[s.subject] || 0) + s.minutes);
+  const rows = Object.entries(by).sort((a, b) => b[1] - a[1]), mx = rows.length ? rows[0][1] : 1;
+  h += `<div class="card"><h3>Time by subject, last 7 days</h3>` + (rows.length ? rows.map(([s, m]) => `<div class="row between" style="margin-top:6px"><span>${esc(s)}</span><span class="muted">${fmtMin(m)}</span></div><div class="pb"><i style="width:${m / mx * 100}%"></i></div>`).join('') : '<p class="muted">Nothing yet.</p>') + `</div>`;
+
+  const sub = ui.silSub, list = state.syllabus[sub] || [], STAT = ['Not started', 'Learning', 'Done', 'Revised'];
+  h += `<div class="card"><h3>Syllabus topics</h3><select data-ch="silSub">${subjOpts(sub)}</select>`;
+  if (list.length) h += `<div class="row between" style="margin:8px 0 4px"><span class="muted">${list.filter(x => x.s >= 2).length} of ${list.length} finished</span></div><div class="pb g"><i style="width:${list.filter(x => x.s >= 2).length / list.length * 100}%"></i></div>`;
+  h += list.map(x => `<div class="row between" style="padding:7px 0;border-top:1px solid var(--line)"><span style="flex:1">${esc(x.t)}</span><button class="chip ${x.s ? 'on' : ''}" data-act="cycleTopic" data-id="${x.id}">${STAT[x.s]}</button><button class="btn sm red" data-act="delTopic" data-id="${x.id}" aria-label="Delete topic">×</button></div>`).join('');
+  h += `<label>Add topics (one per line)</label><textarea id="topics" placeholder="Stress and strain&#10;Shear force diagrams"></textarea><button class="btn sm" style="margin-top:8px" data-act="addTopics">Add topics</button></div>`;
+  return h;
+}
+
+/* ---------- Weekly revision (separate monitoring page) ---------- */
+function woEntries() { return Object.keys(state.weekOff).sort(); }
+function vRevision() {
+  const wk = weekKey(dkey()), cur = revSubjectFor(wk), stats = revisionStats();
+  const totalSched = stats.reduce((a, s) => a + s.scheduled, 0), totalDone = stats.reduce((a, s) => a + s.done, 0);
+  let h = `<div class="card"><h3>This week's full revision</h3><div class="big">${cur ? esc(cur) : '—'}</div>${cur ? chkRow("Mark this week's revision done", (state.wlog[wk] || {}).revision, 'wkToggle', 'revision', dkey()) : '<p class="muted">Add subjects to the rotation below to start.</p>'}</div>`;
+  h += `<div class="grid2" style="margin-bottom:12px"><div class="card" style="margin:0"><div class="mid">${revisionStreak()}</div><div class="muted">week streak</div></div><div class="card" style="margin:0"><div class="mid">${totalSched ? Math.round(totalDone / totalSched * 100) : 0}%</div><div class="muted">weeks completed on time</div></div></div>`;
+
+  /* Academy day off — date moves week to week, so it's scheduled by hand each time */
+  h += `<div class="card"><div class="row between"><h3 style="margin:0">Academy day off</h3>${ui.woForm ? '' : `<button class="btn sm pri" data-act="woNew">+ Add a day off</button>`}</div><p class="muted" style="margin:6px 0 0">Your academy's weekly off isn't a fixed date, so add the actual date each time and pick what you'll revise that day.</p></div>`;
+  if (ui.woForm) {
+    const f = ui.woForm;
+    h += `<div class="card"><h3>${f._orig ? 'Edit' : 'Add'} a day off</h3><label>Date</label><input type="date" id="wodate" value="${f.date}">
+     <label>Subjects to revise that day</label><div class="chips">${state.settings.subjects.map(s => `<button class="chip ${f.subjects.includes(s) ? 'on' : ''}" data-act="woToggleSubj" data-k="${esc(s)}">${esc(s)}</button>`).join('')}</div>
+     <div class="row" style="margin-top:8px"><button class="btn pri" data-act="woSave">Save</button><button class="btn ghost" data-act="woCancel">Cancel</button></div></div>`;
+  }
+  const woKeys = woEntries();
+  if (woKeys.length) {
+    h += woKeys.map(d => {
+      const w = state.weekOff[d], done = w.subjects.filter(s => w.done && w.done[s]).length;
+      return `<div class="card" style="border-left:4px solid var(--orange)"><div class="row between"><b>${fmtDate(d)}${d === dkey() ? ' · Today' : ''}</b><div><button class="btn sm ghost" data-act="woEdit" data-d="${esc(d)}">Edit</button> <button class="btn sm red" data-act="woDelete" data-d="${esc(d)}">Delete</button></div></div>
+       <p class="muted" style="margin:4px 0 0">${done}/${w.subjects.length} revised</p>` +
+        w.subjects.map(s => chkRow(esc(s), !!(w.done && w.done[s]), 'woToggleDone', s, d)).join('') + `</div>`;
+    }).join('');
+  } else if (!ui.woForm) {
+    h += `<div class="card"><p class="muted">No day off scheduled yet. Add one whenever your academy tells you the date.</p></div>`;
+  }
+
+  if (stats.length) {
+    h += `<div class="card"><h3>Progress by subject</h3><p class="muted" style="margin-top:0">How often each subject's revision week has actually been completed.</p>` +
+      stats.map(s => `<div class="row between" style="margin-top:6px"><span>${esc(s.subject)}</span><span class="muted">${s.done}/${s.scheduled} weeks</span></div><div class="pb ${s.scheduled && s.done === s.scheduled ? 'g' : ''}"><i style="width:${s.scheduled ? s.done / s.scheduled * 100 : 0}%"></i></div>`).join('') + `</div>`;
+  }
+  h += `<div class="card"><h3>Coming up</h3>` + [0, 1, 2, 3, 4].map(n => { const k2 = addDays(wk, 7 * n); return `<div class="row between"><span>${n === 0 ? 'This week' : 'Week of ' + fmtDate(k2)}</span><span class="muted">${esc(revSubjectFor(k2) || '—')}</span></div>`; }).join('') + `</div>`;
+  const mw = monthWeeks(), ov = state.settings.revision.overrides;
+  h += `<div class="card"><h3>This month's allocation</h3><p class="muted" style="margin-top:0">Pick a specific subject for any week this month, overriding the rotation below.</p>` +
+    mw.map(wk2 => `<div class="row between" style="margin-top:8px"><span style="flex:1">Week of ${fmtDate(wk2)}</span><select data-ch="revOverride" data-k="${wk2}" style="flex:1.4">${subjOpts(ov[wk2] || revSubjectFor(wk2))}</select>${ov[wk2] ? `<button class="btn sm ghost" data-act="revOverrideClear" data-k="${wk2}">Reset</button>` : ''}</div>`).join('') + `</div>`;
+
+  const ord = state.settings.revision.order;
+  h += `<div class="card"><h3>Rotation order</h3><p class="muted" style="margin-top:0">The plan repeats through this list, one subject per week, unless you've picked a different subject above for that week. Reorder, remove, or add subjects below — changes save right away.</p>` +
+    ord.map((s, i) => `<div class="row between" style="padding:6px 0;border-top:1px solid var(--line)"><span style="flex:1">${i + 1}. ${esc(s)}</span><button class="btn sm ghost" data-act="revMove" data-i="${i}" data-d="-1" ${i === 0 ? 'disabled' : ''} aria-label="Move up">↑</button><button class="btn sm ghost" data-act="revMove" data-i="${i}" data-d="1" ${i === ord.length - 1 ? 'disabled' : ''} aria-label="Move down">↓</button><button class="btn sm red" data-act="revRemove" data-i="${i}" aria-label="Remove">×</button></div>`).join('') +
+    `<div class="row" style="margin-top:10px"><select id="revaddsel" style="flex:1">${subjOpts()}</select><button class="btn sm" data-act="revAdd">Add</button></div>
+     <label style="margin-top:10px">Rotation starts week of</label><input type="date" value="${state.settings.revision.start}" data-ch="revStart"></div>`;
+  return h;
+}
+
+/* ---------- Comprehensive tests ---------- */
+const compPct = c => c.totalMax ? c.totalGot / c.totalMax * 100 : null;
+function vComp() {
+  if (ui.compForm) return vCompForm();
+  const list = state.comps.slice().sort((a, b) => a.date.localeCompare(b.date) || a.ts - b.ts);
+  let h = `<div class="card"><div class="row between"><h3 style="margin:0">Comprehensive tests</h3><button class="btn sm pri" data-act="compNew">Add result</button></div>
+   <p class="muted" style="margin:6px 0 0">Log your institute's monthly comprehensive test: rank, subject-wise marks, and how many you got right or wrong.</p></div>`;
+  if (!list.length) { h += `<div class="card"><p class="muted">No comprehensive tests logged yet. Tap Add result after your next monthly test.</p></div>`; return h; }
+  const last = list[list.length - 1], lastPct = compPct(last);
+  h += `<div class="card"><h3>Latest: ${esc(last.name)}</h3><p class="muted" style="margin-top:0">${fmtDate(last.date)}${last.rank ? ' · Rank ' + last.rank + (last.rankOut ? ' of ' + last.rankOut : '') : ''}</p>
+   <div class="donutwrap">${lastPct != null ? donutSVG(lastPct, pctColor(lastPct)) : ''}<div><div class="mid">${last.totalMax ? r2(last.totalGot) + ' / ' + last.totalMax : '—'}</div><div class="muted">total marks</div></div></div></div>`;
+  if (last.subjects.length) {
+    h += `<div class="card"><h3>Marks by subject – latest test</h3>` + last.subjects.map(s => {
+      const pct = s.max ? r2(s.got / s.max * 100) : null;
+      return `<div class="row between" style="margin-top:6px"><span>${esc(s.subject)}</span><span class="muted">${s.max ? r2(s.got) + '/' + s.max : '—'}${pct != null ? ' · ' + pct + '%' : ''}${s.correct != null || s.wrong != null ? ` · ${s.correct != null ? s.correct : '?'} right, ${s.wrong != null ? s.wrong : '?'} wrong` : ''}</span></div><div class="pb"><i style="width:${pct != null ? pct : 0}%;background:${pctColor(pct)}"></i></div>`;
+    }).join('') + `</div>`;
+  }
+  const pts = list.map(compPct).filter(x => x != null);
+  h += `<div class="card"><h3>Score trend across tests (%)</h3>${pts.length > 1 ? barSVGColored(pts, list.filter(c => compPct(c) != null).map(c => pdate(c.date).getDate() + '/' + (pdate(c.date).getMonth() + 1))) : `<p class="muted">Log at least 2 tests with total marks to see a trend.</p>`}</div>`;
+  const ranked = list.filter(c => c.rank);
+  if (ranked.length) { const l = ranked[ranked.length - 1]; h += `<div class="card"><h3>Rank trend</h3>${ranked.length > 1 ? lineSVG(ranked.map(c => c.rank), Math.max(...ranked.map(c => c.rank)), '#8E44AD') : ''}<p class="muted">Lower rank is better. Latest: ${l.rank}${l.rankOut ? ' of ' + l.rankOut : ''}.</p></div>`; }
+  const subs = [...new Set(list.flatMap(c => c.subjects.map(s => s.subject)))].sort();
+  if (subs.length && list.length > 1) {
+    const colorMap = {}; subs.forEach((s, i) => colorMap[s] = PALETTE[i % PALETTE.length]);
+    const shown = subs.filter(s => !ui.compHidden[s]);
+    h += `<div class="card"><h3>Comparative growth across subjects</h3><p class="muted" style="margin-top:0">Tap a subject to hide or show its line.</p><div class="chips">${subs.map(s => `<button class="chip ${ui.compHidden[s] ? '' : 'on'}" style="${ui.compHidden[s] ? '' : `background:${colorMap[s]};border-color:${colorMap[s]}`}" data-act="compToggleGrowth" data-k="${esc(s)}">${esc(s)}</button>`).join('')}</div>
+     ${multiLineSVG(list, shown.map(s => ({ subject: s, color: colorMap[s] })))}
+     <div class="legend">${shown.map(s => `<span><i class="sw" style="background:${colorMap[s]}"></i>${esc(s)}</span>`).join('')}</div></div>`;
+    h += `<div class="card"><h3>Comparative table – all tests</h3><div style="overflow-x:auto"><table><tr><th>Subject</th>${list.map(c => `<th class="n">${esc(c.name.length > 10 ? c.name.slice(0, 9) + '…' : c.name)}</th>`).join('')}</tr>${subs.map(s => `<tr><td>${esc(s)}</td>${list.map(c => { const row = c.subjects.find(x => x.subject === s), pct = row && row.max ? r2(row.got / row.max * 100) : null; return `<td class="n" style="${pct != null ? `color:${pctColor(pct)};font-weight:700` : ''}">${pct != null ? pct + '%' : '—'}</td>`; }).join('')}</tr>`).join('')}</table></div></div>`;
+  }
+  h += `<div class="card"><h3>Subject-wise progress</h3><div class="chips">${subs.map(s => `<button class="chip ${(ui.compSubj || subs[0]) === s ? 'on' : ''}" data-act="compSubj" data-k="${esc(s)}">${esc(s)}</button>`).join('')}</div>`;
+  const sub = ui.compSubj || subs[0];
+  if (sub) {
+    const svals = list.filter(c => c.subjects.some(x => x.subject === sub && x.max)).map(c => { const x = c.subjects.find(y => y.subject === sub); return x.got / x.max * 100; });
+    h += svals.length ? `<p class="muted" style="margin:8px 0 4px">${esc(sub)}</p>${svals.length > 1 ? lineSVG(svals) : `<p class="muted">Only one test has marks logged for this subject so far.</p>`}` : `<p class="muted">No marks logged yet for ${esc(sub)}.</p>`;
+  }
+  h += `</div>`;
+  if (list.length >= 2) {
+    const prev = list[list.length - 2], cur = list[list.length - 1], subsC = [...new Set([...prev.subjects, ...cur.subjects].map(s => s.subject))];
+    h += `<div class="card"><h3>Latest vs previous</h3><p class="muted" style="margin-top:0">${esc(prev.name)} → ${esc(cur.name)}</p><table><tr><th>Subject</th><th class="n">Previous</th><th class="n">Latest</th><th class="n">Change</th></tr>` + subsC.map(s => {
+      const p = prev.subjects.find(x => x.subject === s), c = cur.subjects.find(x => x.subject === s);
+      const pv = p && p.max ? r2(p.got / p.max * 100) : null, cv = c && c.max ? r2(c.got / c.max * 100) : null, delta = pv != null && cv != null ? r2(cv - pv) : null;
+      return `<tr><td>${esc(s)}</td><td class="n">${pv == null ? '—' : pv + '%'}</td><td class="n">${cv == null ? '—' : cv + '%'}</td><td class="n">${delta == null ? '—' : `<span class="${delta >= 0 ? 'up' : 'down'}">${delta >= 0 ? '▲' : '▼'} ${Math.abs(delta)}%</span>`}</td></tr>`;
+    }).join('') + `</table></div>`;
+  }
+  h += `<div class="card"><h3>History</h3>` + list.slice().reverse().map(c => { const p = compPct(c); return `<div class="row between" style="padding:9px 0;border-top:1px solid var(--line);cursor:pointer" data-act="compEdit" data-id="${c.id}"><span><b>${esc(c.name)}</b><div class="muted">${fmtDate(c.date)}${c.rank ? ' · Rank ' + c.rank + (c.rankOut ? '/' + c.rankOut : '') : ''}</div></span><span style="text-align:right"><b>${c.totalMax ? r2(c.totalGot) + '/' + c.totalMax : '—'}</b>${p != null ? `<div class="muted">${Math.round(p)}%</div>` : ''}</span></div>`; }).join('') + `</div>`;
+  return h;
+}
+function vCompForm() {
+  const f = ui.compForm, sumMax = f.rows.reduce((a, r) => a + (+r.max || 0), 0), sumGot = f.rows.reduce((a, r) => a + (+r.got || 0), 0);
+  let h = `<div class="row between" style="margin-bottom:8px"><h2 style="margin:0">${f.id ? 'Edit' : 'Add'} comprehensive test</h2><button class="btn sm ghost" data-act="compCancel">Cancel</button></div>
+  <div class="card"><label>Test name</label><input id="cfname" value="${esc(f.name)}" placeholder="Comprehensive Test 4">
+  <div class="grid2"><div><label>Date</label><input type="date" id="cfdate" value="${f.date}"></div><div><label>For</label><select id="cfexam"><option value="SSC" ${f.examTag === 'SSC' ? 'selected' : ''}>${esc(exl('SSC'))}</option><option value="TN" ${f.examTag === 'TN' ? 'selected' : ''}>${esc(exl('TN'))}</option><option value="BOTH" ${f.examTag === 'BOTH' ? 'selected' : ''}>Both</option><option value="GEN" ${f.examTag === 'GEN' ? 'selected' : ''}>General</option></select></div>
+  <div><label>Rank</label><input type="number" id="cfrank" min="1" value="${f.rank}"></div><div><label>Out of (total candidates)</label><input type="number" id="cfrankout" min="1" value="${f.rankOut}"></div></div></div>
+  <div class="card"><h3>Subject-wise marks</h3><p class="muted" style="margin-top:0">Add one row per subject.</p>`;
+  f.rows.forEach((r, i) => {
+    h += `<div style="border-top:1px solid var(--line);padding-top:8px;margin-top:8px"><div class="row"><select data-ch="compRow" data-i="${i}" data-f="subject" style="flex:2">${subjOpts(r.subject)}</select><button class="btn sm red" data-act="compRowDel" data-i="${i}" aria-label="Remove row">×</button></div>
+    <div class="grid2" style="margin-top:6px"><div><label>Max marks</label><input type="number" data-ch="compRow" data-i="${i}" data-f="max" value="${r.max}"></div><div><label>Marks got</label><input type="number" data-ch="compRow" data-i="${i}" data-f="got" value="${r.got}"></div><div><label>Correct</label><input type="number" data-ch="compRow" data-i="${i}" data-f="correct" value="${r.correct}"></div><div><label>Wrong</label><input type="number" data-ch="compRow" data-i="${i}" data-f="wrong" value="${r.wrong}"></div></div></div>`;
+  });
+  h += `<button class="btn sm" style="margin-top:10px" data-act="compRowAdd">Add subject</button></div>
+  <div class="card"><div class="row between"><span>Total so far</span><b>${r2(sumGot)} / ${sumMax}</b></div></div>
+  <div class="row">${f.id ? `<button class="btn red" data-act="compDelete" data-id="${f.id}">Delete</button>` : ''}<button class="btn pri" data-act="compSave">Save</button></div>`;
+  return h;
+}
+
+/* ---------- Sleep ---------- */
+function vSleep() {
+  const t = dkey(), days = [...Array(14)].map((_, i) => addDays(t, i - 13)), hrs = days.map(k => state.sleep[k] ? state.sleep[k].hours : 0);
+  const ent = Object.keys(state.sleep).sort().reverse(), last7 = Object.keys(state.sleep).sort().slice(-7).map(k => state.sleep[k]);
+  const avg = last7.length ? last7.reduce((a, s) => a + s.hours, 0) / last7.length : 0, goal = state.settings.sleepGoal;
+  let h = `<div class="card"><h3>Log last night</h3><label>Wake-up date</label><input type="date" id="sdate" value="${t}"><div class="grid2"><div><label>Went to bed</label><input type="time" id="sbed" value="23:00"></div><div><label>Woke up</label><input type="time" id="swake" value="05:30"></div><div><label>Sleep quality (1 to 5)</label><select id="sq">${[1, 2, 3, 4, 5].map(n => `<option ${n === 3 ? 'selected' : ''}>${n}</option>`).join('')}</select></div><div><label>Exercise or walk (minutes)</label><input type="number" id="sact" min="0" placeholder="30"></div></div><div style="margin-top:10px"><button class="btn" data-act="saveSleep">Save</button></div></div>`;
+  h += `<div class="card"><h3>Sleep hours, last 14 days</h3>${barSVG(hrs, days.map(k => pdate(k).getDate()), goal)}<div class="muted">Orange line is your ${goal} h goal.</div>` +
+    (last7.length ? `<p><b>7-day average ${avg.toFixed(1)} h.</b> ${avg < goal - 1 ? 'You are well under your goal. Protect sleep before adding more study hours.' : avg < goal ? 'Slightly under your goal.' : 'On target.'}</p>` : '') + `</div>`;
+  h += `<div class="card"><h3>History</h3>` + (ent.length ? ent.slice(0, 20).map(k => { const s = state.sleep[k]; return `<div class="row between" style="padding:6px 0;border-top:1px solid var(--line)"><span>${fmtDate(k)}<div class="muted">${s.bed}–${s.wake} · quality ${s.q}/5${s.act ? ' · active ' + s.act + ' min' : ''}</div></span><span><b>${s.hours.toFixed(1)} h</b> <button class="btn sm red" data-act="delSleep" data-k="${k}" aria-label="Delete">×</button></span></div>`; }).join('') : '<p class="muted">No entries yet.</p>') + `</div>`;
+  return h;
+}
+
+/* ---------- Settings ---------- */
+function vSettings() {
+  const s = state.settings;
+  return `<div class="card"><h3>You</h3><label>Name</label><input value="${esc(s.name)}" data-ch="set" data-p="name">
+  <div class="grid2"><div><label>${esc(s.exams.SSC.label)} exam date</label><input type="date" value="${s.exams.SSC.date}" data-ch="set" data-p="exams.SSC.date"></div><div><label>${esc(s.exams.TN.label)} exam date</label><input type="date" value="${s.exams.TN.date}" data-ch="set" data-p="exams.TN.date"></div>
+  <div><label>Sleep goal (hours)</label><input type="number" step="0.5" value="${s.sleepGoal}" data-ch="set" data-p="sleepGoal" data-num="1"></div></div></div>
+  <div class="card"><h3>Daily targets</h3><div class="grid2"><div><label>Civil MCQs</label><input type="number" value="${s.targets.mcq}" data-ch="set" data-p="targets.mcq" data-num="1"></div><div><label>PYQs</label><input type="number" value="${s.targets.pyq}" data-ch="set" data-p="targets.pyq" data-num="1"></div><div><label>Aptitude questions</label><input type="number" value="${s.targets.apt}" data-ch="set" data-p="targets.apt" data-num="1"></div><div><label>Older-topic revision (minutes)</label><input type="number" value="${s.targets.rev}" data-ch="set" data-p="targets.rev" data-num="1"></div></div></div>
+  <div class="card"><h3>Subjects</h3><div class="chips">${s.subjects.map(x => `<span class="chip">${esc(x)} <a href="#" data-act="delSubject" data-k="${esc(x)}" style="color:var(--red);text-decoration:none" aria-label="Remove">×</a></span>`).join('')}</div><div class="row"><input id="newsub" placeholder="New subject" style="flex:1"><button class="btn sm" data-act="addSubject">Add</button></div></div>
+  <div class="card"><h3>Backup</h3><p class="muted" style="margin-top:0">Your data lives only on this device (this browser's storage). Save a backup file now and then, and especially before clearing browser data, switching phones, or moving this file. Restoring a backup replaces what's currently in the app.</p><div class="row"><button class="btn" data-act="exportData">Save backup</button><button class="btn ghost" data-act="importData">Restore backup</button></div><p class="muted" id="stor"></p><button class="btn sm ghost" data-act="persist">Ask browser to keep my data</button></div>
+  <div class="card"><h3>Keep this on your Home screen</h3><p class="muted" style="margin-top:0">If this page is hosted at a fixed web address (not opened as a local file), installing it works properly and your data stays put between visits, since it's tied to that one address.</p>
+  <button id="installBtn" class="btn" style="display:none" data-act="installApp">Install LevelBook</button>
+  <p class="muted">If that button doesn't appear, open Chrome's menu (⋮) on this page and choose "Add to Home screen" or "Install app".</p></div>
+  <div class="card"><h3>Reset</h3><button class="btn red" data-act="resetAll">Erase everything on this device</button></div>`;
+}
+
+/* =========================================================
+   ACTIONS
+   ========================================================= */
+const acts = {
+  tab(el) { ui.tab = el.dataset.t; render(); scrollTo(0, 0); if (ui.tab === 'settings') showStorage(); },
+  /* plan */
+  planNav(el) { ui.planDate = addDays(ui.planDate, +el.dataset.d); render(); },
+  planToday() { ui.planDate = dkey(); render(); },
+  setType(el) { const k = ui.planDate, d = pdate(k).getDay(); if (state.settings.weekMap[d] === el.dataset.t) delete state.overrides[k]; else state.overrides[k] = el.dataset.t; save(); render(); },
+  setTypeToday(el) { const k = dkey(); if (state.settings.weekMap[pdate(k).getDay()] === el.dataset.t) delete state.overrides[k]; else state.overrides[k] = el.dataset.t; save(); render(); },
+  applyWeek() { const t = schedFor(ui.planDate); for (let i = 0; i < 7; i++) state.overrides[addDays(ui.planDate, i)] = t; save(); render(); toast('Batch set for 7 days'); },
+  toggleBlock(el) { const k = ui.planDate, type = schedFor(k), key = type + ':' + el.dataset.id; state.done[k] = state.done[k] || {}; if (state.done[k][key]) delete state.done[k][key]; else state.done[k][key] = 1; save(); render(); },
+  startBlock(el) {
+    const type = schedFor(ui.planDate), b = state.schedules[type].find(x => x.id === el.dataset.id); if (!b || (b.cat || 'study') !== 'study') return;
+    state.timer = { start: Date.now(), exam: ui.tExam, subject: b.subject, topic: b.task, blockKey: type + ':' + b.id }; save(); ui.tab = 'track'; render(); toast('Timer started');
+  },
+  planEditOn() { ui.planEdit = true; render(); }, planEditOff() { ui.planEdit = false; render(); },
+  editTab(el) { ui.editType = el.dataset.t; render(); },
+  addBlock() { state.schedules[ui.editType].push(B('09:00', '10:00', state.settings.subjects[0] || 'Study', '')); save(); render(); },
+  delBlock(el) { state.schedules[ui.editType] = state.schedules[ui.editType].filter(b => b.id !== el.dataset.id); save(); render(); },
+  pasteSched() {
+    const txt = $('#paste').value, out = [], re = /(\d{1,2})[:.](\d{2})\s*(am|pm)?\s*(?:-|–|—|to)\s*(\d{1,2})[:.](\d{2})\s*(am|pm)?\s*[-:–—]?\s*(.*)/i;
+    const conv = (h, m, ap) => { h = +h; if (ap) { ap = ap.toLowerCase(); if (ap === 'pm' && h < 12) h += 12; if (ap === 'am' && h === 12) h = 0; } return pad(h) + ':' + m; };
+    txt.split('\n').forEach(line => {
+      const m = line.match(re); if (!m) return;
+      let rest = m[7].trim(), subj = state.settings.subjects.find(s => rest.toLowerCase().includes(s.toLowerCase())), task = '';
+      const low = rest.toLowerCase(), cat = /coaching|class\b/.test(low) ? 'class' : /breakfast|lunch|dinner/.test(low) ? 'meal' : /sleep/.test(low) && !/rest/.test(low) ? 'sleep' : /travel|get ready|break\b|rest|nap/.test(low) ? 'rest' : 'study';
+      if (subj) task = rest.replace(new RegExp(subj.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'), '').replace(/^[\s\-:–—]+|[\s\-:–—]+$/g, '');
+      if (cat !== 'study') { subj = rest; task = ''; } else if (!subj) { subj = /aptitude|reasoning/.test(low) ? 'Aptitude & Reasoning' : /pyq|error|mistake/.test(low) ? 'PYQs and error notebook' : 'Civil (mixed)'; task = rest; }
+      out.push(B(conv(m[1], m[2], m[3]), conv(m[4], m[5], m[6]), subj, task, cat));
+    });
+    if (!out.length) return toast('No time ranges found. Use lines like 6:00-7:30 Surveying');
+    out.sort((x, y) => t2m(x.start) - t2m(y.start)); state.schedules[ui.editType] = out; save(); render(); toast(out.length + ' blocks added');
+  },
+  /* daily / weekly ticks */
+  tgtAdd(el) { const k = dkey(), l = state.tlog[k] = state.tlog[k] || {}, f = el.dataset.f; l[f] = Math.max(0, (l[f] || 0) + +el.dataset.d); save(); render(); },
+  tgtToggle(el) { const l = state.tlog[el.dataset.k] = state.tlog[el.dataset.k] || {}; l[el.dataset.f] = !l[el.dataset.f]; save(); render(); },
+  wkToggle(el) { const wk = weekKey(el.dataset.k), l = state.wlog[wk] = state.wlog[wk] || {}; l[el.dataset.f] = !l[el.dataset.f]; save(); render(); },
+  revMove(el) { const o = state.settings.revision.order, i = +el.dataset.i, j = i + (+el.dataset.d); if (j < 0 || j >= o.length) return; [o[i], o[j]] = [o[j], o[i]]; save(); render(); },
+  revRemove(el) { state.settings.revision.order.splice(+el.dataset.i, 1); save(); render(); },
+  revAdd() { const v = $('#revaddsel').value; if (!v) return; if (!state.settings.revision.order.includes(v)) state.settings.revision.order.push(v); save(); render(); },
+  woNew() { ui.woForm = { date: dkey(), subjects: [] }; render(); scrollTo(0, 0); },
+  woEdit(el) { const d = el.dataset.d, w = state.weekOff[d]; if (!w) return; ui.woForm = { date: d, subjects: w.subjects.slice(), _orig: d }; render(); scrollTo(0, 0); },
+  woCancel() { ui.woForm = null; render(); },
+  woToggleSubj(el) { const a = ui.woForm.subjects, s = el.dataset.k, i = a.indexOf(s); if (i >= 0) a.splice(i, 1); else a.push(s); render(); },
+  woSave() {
+    const f = ui.woForm, d = $('#wodate').value || f.date;
+    if (!f.subjects.length) return toast('Pick at least one subject to revise');
+    const existing = (f._orig && state.weekOff[f._orig]) || {};
+    if (f._orig && f._orig !== d) delete state.weekOff[f._orig];
+    const done = {}; f.subjects.forEach(s => done[s] = !!(existing.done && existing.done[s]));
+    state.weekOff[d] = { subjects: f.subjects.slice(), done };
+    ui.woForm = null; save(); render(); toast('Saved');
+  },
+  woToggleDone(el) { const d = el.dataset.k, s = el.dataset.f, w = state.weekOff[d]; if (!w) return; w.done = w.done || {}; w.done[s] = !w.done[s]; save(); render(); },
+  woDelete(el) { if (!confirm('Delete this day-off plan?')) return; delete state.weekOff[el.dataset.d]; save(); render(); },
+  /* tracker */
+  tExam(el) { ui.tExam = el.dataset.k; render(); },
+  startTimer() { state.timer = { start: Date.now(), exam: ui.tExam, subject: $('#tsub').value, topic: $('#ttopic').value.trim() }; save(); render(); },
+  stopTimer() {
+    const tm = state.timer, mins = Math.max(1, Math.round((Date.now() - tm.start) / 60000));
+    state.sessions.push({ id: uid(), date: dkey(new Date(tm.start)), exam: tm.exam, subject: tm.subject, topic: tm.topic, minutes: mins, ts: Date.now() });
+    if (tm.blockKey) { const k = dkey(); state.done[k] = state.done[k] || {}; state.done[k][tm.blockKey] = 1; }
+    state.timer = null; save(); render(); toast('Saved ' + fmtMin(mins));
+  },
+  cancelTimer() { if (confirm('Discard this timer?')) { state.timer = null; save(); render(); } },
+  addSession() {
+    const m = +$('#mmin').value; if (!m || m < 1) return toast('Enter the minutes studied');
+    state.sessions.push({ id: uid(), date: $('#mdate').value || dkey(), exam: ui.tExam, subject: $('#msub').value, topic: '', minutes: m, ts: Date.now() }); save(); render(); toast('Added');
+  },
+  delSession(el) { state.sessions = state.sessions.filter(s => s.id !== el.dataset.id); save(); render(); },
+  addTopics() {
+    const lines = $('#topics').value.split('\n').map(s => s.trim()).filter(Boolean); if (!lines.length) return;
+    (state.syllabus[ui.silSub] = state.syllabus[ui.silSub] || []).push(...lines.map(t => ({ id: uid(), t, s: 0 }))); save(); render();
+  },
+  cycleTopic(el) { const x = (state.syllabus[ui.silSub] || []).find(y => y.id === el.dataset.id); if (x) x.s = (x.s + 1) % 4; save(); render(); },
+  delTopic(el) { state.syllabus[ui.silSub] = (state.syllabus[ui.silSub] || []).filter(y => y.id !== el.dataset.id); save(); render(); },
+  /* comprehensive tests */
+  compNew() { ui.compForm = { id: null, name: 'Comprehensive Test ' + (state.comps.length + 1), date: dkey(), examTag: 'BOTH', rank: '', rankOut: '', rows: [{ subject: state.settings.subjects[0], max: '', got: '', correct: '', wrong: '' }] }; render(); scrollTo(0, 0); },
+  compEdit(el) { const c = state.comps.find(x => x.id === el.dataset.id); if (!c) return; ui.compForm = { id: c.id, name: c.name, date: c.date, examTag: c.examTag, rank: c.rank || '', rankOut: c.rankOut || '', rows: c.subjects.map(s => Object.assign({}, s)) }; render(); scrollTo(0, 0); },
+  compCancel() { ui.compForm = null; render(); },
+  compRowAdd() { ui.compForm.rows.push({ subject: state.settings.subjects[0], max: '', got: '', correct: '', wrong: '' }); render(); },
+  compRowDel(el) { ui.compForm.rows.splice(+el.dataset.i, 1); render(); },
+  compSave() {
+    const f = ui.compForm;
+    f.name = $('#cfname').value.trim() || f.name; f.date = $('#cfdate').value || f.date; f.examTag = $('#cfexam').value;
+    f.rank = +$('#cfrank').value || null; f.rankOut = +$('#cfrankout').value || null;
+    const rows = f.rows.map(r => ({ subject: r.subject, max: r.max === '' ? 0 : +r.max, got: r.got === '' ? 0 : +r.got, correct: r.correct === '' || r.correct == null ? null : +r.correct, wrong: r.wrong === '' || r.wrong == null ? null : +r.wrong })).filter(r => r.max || r.got || r.correct != null || r.wrong != null);
+    if (!rows.length) return toast('Add at least one subject with marks');
+    const totalMax = rows.reduce((a, r) => a + r.max, 0), totalGot = rows.reduce((a, r) => a + r.got, 0);
+    const rec = { id: f.id || uid(), ts: Date.now(), name: f.name, date: f.date, examTag: f.examTag, rank: f.rank, rankOut: f.rankOut, subjects: rows, totalMax, totalGot };
+    if (f.id) { const i = state.comps.findIndex(x => x.id === f.id); state.comps[i] = rec; } else state.comps.push(rec);
+    ui.compForm = null; save(); render(); toast('Saved');
+  },
+  compDelete(el) { if (!confirm('Delete this comprehensive test?')) return; state.comps = state.comps.filter(c => c.id !== el.dataset.id); ui.compForm = null; save(); render(); },
+  compSubj(el) { ui.compSubj = el.dataset.k; render(); },
+  compToggleGrowth(el) { const s = el.dataset.k; if (ui.compHidden[s]) delete ui.compHidden[s]; else ui.compHidden[s] = true; render(); },
+  revOverrideClear(el) { delete state.settings.revision.overrides[el.dataset.k]; save(); render(); },
+  /* sleep */
+  saveSleep() {
+    const bed = $('#sbed').value, wake = $('#swake').value, d = $('#sdate').value || dkey(); if (!bed || !wake) return toast('Enter both times');
+    let m = t2m(wake) - t2m(bed); if (m <= 0) m += 1440;
+    state.sleep[d] = { bed, wake, hours: m / 60, q: +$('#sq').value, act: +$('#sact').value || 0 }; save(); render(); toast('Saved ' + (m / 60).toFixed(1) + ' h');
+  },
+  delSleep(el) { delete state.sleep[el.dataset.k]; save(); render(); },
+  /* settings */
+  addSubject() { const v = $('#newsub').value.trim(); if (v && !state.settings.subjects.includes(v)) { state.settings.subjects.push(v); save(); render(); } },
+  delSubject(el, e) { e && e.preventDefault(); state.settings.subjects = state.settings.subjects.filter(s => s !== el.dataset.k); save(); render(); },
+  async exportData() {
+    const b = new Blob([JSON.stringify(state)], { type: 'application/json' }), name = 'levelbook-backup-' + dkey() + '.json';
+    if (downloadsCap) { try { await downloadsCap.save({ filename: name, data: b }); toast('Backup saved'); } catch (e) { if (e && e.code !== 'declined') toast('Could not save backup'); } return; }
+    const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = name; document.body.appendChild(a); a.click(); a.remove(); toast('Backup saved to your downloads');
+  },
+  importData() { $('#inBackup').click(); },
+  persist() { if (navigator.storage && navigator.storage.persist) navigator.storage.persist().then(ok => { toast(ok ? 'Browser will keep your data' : 'Browser did not agree. Keep backups.'); showStorage(); }); },
+  installApp() {
+    if (window.__lbPrompt) { window.__lbPrompt.prompt(); window.__lbPrompt.userChoice.finally(() => { window.__lbPrompt = null; }); }
+    else toast('Open your browser menu (⋮) and choose "Add to Home screen"');
+  },
+  resetAll() { if (confirm('Erase all plans, logs, tests and files from this device?') && confirm('This cannot be undone. Erase everything?')) { state = defaultState(); ui.silSub = state.settings.subjects[0]; try { idbPut('kv', state, 'state'); const tx = db.transaction('blobs', 'readwrite'); tx.objectStore('blobs').clear(); } catch (e) {} render(); } }
+};
+const chs = {
+  schedName(el) { state.settings.schedNames[ui.editType] = el.value; save(); },
+  blk(el) { const b = state.schedules[ui.editType].find(x => x.id === el.dataset.id); if (!b) return; b[el.dataset.f] = el.value; if (el.dataset.f === 'start') state.schedules[ui.editType].sort((x, y) => t2m(x.start) - t2m(y.start)); save(); if (el.dataset.f === 'start' || el.dataset.f === 'cat') render(); },
+  weekMap(el) { state.settings.weekMap[+el.dataset.d] = el.value; save(); },
+  silSub(el) { ui.silSub = el.value; render(); },
+  compRow(el) { ui.compForm.rows[+el.dataset.i][el.dataset.f] = el.value; render(); },
+  revOverride(el) { state.settings.revision.overrides[el.dataset.k] = el.value; save(); render(); },
+  revStart(el) { state.settings.revision.start = weekKey(el.value || dkey()); save(); render(); },
+  set(el) { const p = el.dataset.p.split('.'); let o = state.settings; while (p.length > 1) o = o[p.shift()]; o[p[0]] = el.dataset.num ? +el.value : el.value; save(); if (el.dataset.p.includes('date')) render(); }
+};
+document.addEventListener('click', e => { const el = e.target.closest('[data-act]'); if (el && acts[el.dataset.act]) acts[el.dataset.act](el, e); });
+document.addEventListener('change', e => { const el = e.target.closest('[data-ch]'); if (el && chs[el.dataset.ch]) chs[el.dataset.ch](el); });
+
+function tick() {
+  const a = $('#tmr'); if (a && state.timer) a.textContent = clock((Date.now() - state.timer.start) / 1000);
+}
+
+function showStorage() {
+  const el = $('#stor'); if (!el || !navigator.storage || !navigator.storage.estimate) return;
+  navigator.storage.estimate().then(s => { el.textContent = `Using ${fmtSize(s.usage || 0)} of about ${fmtSize(s.quota || 0)} available on this device.`; });
+}
+function setupInstall() {
+  window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); window.__lbPrompt = e; const b = $('#installBtn'); if (b) b.style.display = 'inline-block'; });
+  try { if ('serviceWorker' in navigator) navigator.serviceWorker.register('service-worker.js'); } catch (e) {}
+}
+
+init();
+</script>
+</body>
+</html>
